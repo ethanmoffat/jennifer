@@ -26,6 +26,7 @@ const (
 type token struct {
 	typ     tokenType
 	content interface{}
+	format  string
 }
 
 func (t token) isNull(f *File) bool {
@@ -39,13 +40,21 @@ func (t token) isNull(f *File) bool {
 func (t token) render(f *File, w io.Writer, s *Statement) error {
 	switch t.typ {
 	case literalToken:
+		formatLiteral := func() string {
+			if len(t.format) > 0 {
+				return fmt.Sprintf(t.format, t.content)
+			} else {
+				// default constant types can be left bare
+				return fmt.Sprintf("%#v", t.content)
+			}
+		}
+
 		var out string
 		switch t.content.(type) {
 		case bool, string, int, complex128:
-			// default constant types can be left bare
-			out = fmt.Sprintf("%#v", t.content)
+			out = formatLiteral()
 		case float64:
-			out = fmt.Sprintf("%#v", t.content)
+			out = formatLiteral()
 			if !strings.Contains(out, ".") && !strings.Contains(out, "e") {
 				// If the formatted value is not in scientific notation, and does not have a dot, then
 				// we add ".0". Otherwise it will be interpreted as an int.
@@ -56,10 +65,18 @@ func (t token) render(f *File, w io.Writer, s *Statement) error {
 			}
 		case float32, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr:
 			// other built-in types need specific type info
-			out = fmt.Sprintf("%T(%#v)", t.content, t.content)
+			if len(t.format) > 0 {
+				out = fmt.Sprintf(fmt.Sprintf("%%T(%s)", t.format), t.content, t.content)
+			} else {
+				out = fmt.Sprintf("%T(%#v)", t.content, t.content)
+			}
 		case complex64:
-			// fmt package already renders parenthesis for complex64
-			out = fmt.Sprintf("%T%#v", t.content, t.content)
+			if len(t.format) > 0 {
+				out = fmt.Sprintf(fmt.Sprintf("%%T%s", t.format), t.content, t.content)
+			} else {
+				// fmt package already renders parenthesis for complex64
+				out = fmt.Sprintf("%T%#v", t.content, t.content)
+			}
 		default:
 			panic(fmt.Sprintf("unsupported type for literal: %T", t.content))
 		}

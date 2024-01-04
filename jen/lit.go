@@ -1,14 +1,14 @@
 package jen
 
-// Lit renders a literal. Lit supports only built-in types (bool, string, int, complex128, float64, 
-// float32, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64). 
+// Lit renders a literal. Lit supports only built-in types (bool, string, int, complex128, float64,
+// float32, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64).
 // Passing any other type will panic.
 func Lit(v interface{}) *Statement {
 	return newStatement().Lit(v)
 }
 
-// Lit renders a literal. Lit supports only built-in types (bool, string, int, complex128, float64, 
-// float32, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64). 
+// Lit renders a literal. Lit supports only built-in types (bool, string, int, complex128, float64,
+// float32, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64).
 // Passing any other type will panic.
 func (g *Group) Lit(v interface{}) *Statement {
 	s := Lit(v)
@@ -16,8 +16,8 @@ func (g *Group) Lit(v interface{}) *Statement {
 	return s
 }
 
-// Lit renders a literal. Lit supports only built-in types (bool, string, int, complex128, float64, 
-// float32, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64). 
+// Lit renders a literal. Lit supports only built-in types (bool, string, int, complex128, float64,
+// float32, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64).
 // Passing any other type will panic.
 func (s *Statement) Lit(v interface{}) *Statement {
 	t := token{
@@ -28,17 +28,17 @@ func (s *Statement) Lit(v interface{}) *Statement {
 	return s
 }
 
-// LitFunc renders a literal. LitFunc generates the value to render by executing the provided 
-// function. LitFunc supports only built-in types (bool, string, int, complex128, float64, float32, 
-// int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64). 
+// LitFunc renders a literal. LitFunc generates the value to render by executing the provided
+// function. LitFunc supports only built-in types (bool, string, int, complex128, float64, float32,
+// int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64).
 // Returning any other type will panic.
 func LitFunc(f func() interface{}) *Statement {
 	return newStatement().LitFunc(f)
 }
 
-// LitFunc renders a literal. LitFunc generates the value to render by executing the provided 
-// function. LitFunc supports only built-in types (bool, string, int, complex128, float64, float32, 
-// int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64). 
+// LitFunc renders a literal. LitFunc generates the value to render by executing the provided
+// function. LitFunc supports only built-in types (bool, string, int, complex128, float64, float32,
+// int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64).
 // Returning any other type will panic.
 func (g *Group) LitFunc(f func() interface{}) *Statement {
 	s := LitFunc(f)
@@ -46,9 +46,9 @@ func (g *Group) LitFunc(f func() interface{}) *Statement {
 	return s
 }
 
-// LitFunc renders a literal. LitFunc generates the value to render by executing the provided 
-// function. LitFunc supports only built-in types (bool, string, int, complex128, float64, float32, 
-// int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64). 
+// LitFunc renders a literal. LitFunc generates the value to render by executing the provided
+// function. LitFunc supports only built-in types (bool, string, int, complex128, float64, float32,
+// int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, uintptr and complex64).
 // Returning any other type will panic.
 func (s *Statement) LitFunc(f func() interface{}) *Statement {
 	t := token{
@@ -148,6 +148,67 @@ func (s *Statement) LitByteFunc(f func() byte) *Statement {
 	t := token{
 		typ:     literalByteToken,
 		content: f(),
+	}
+	*s = append(*s, t)
+	return s
+}
+
+// LitFormat renders a literal with the specified format. Lit supports only built-in types (bool,
+// string, int, complex128, float64, float32, int8, int16, int32, int64, uint, uint8, uint16,
+// uint32, uint64, uintptr and complex64). Passing any other type will panic.
+func LitFormat(v interface{}, format string) *Statement {
+	return newStatement().LitFormat(v, format)
+}
+
+// LitFormat renders a literal with the specified format. Lit supports only built-in types (bool,
+// string, int, complex128, float64, float32, int8, int16, int32, int64, uint, uint8, uint16,
+// uint32, uint64, uintptr and complex64). Passing any other type will panic.
+func (g *Group) LitFormat(v interface{}, format string) *Statement {
+	s := LitFormat(v, format)
+	g.items = append(g.items, s)
+	return s
+}
+
+// LitFormat renders a literal with the specified format. Lit supports only built-in types (bool,
+// string, int, complex128, float64, float32, int8, int16, int32, int64, uint, uint8, uint16,
+// uint32, uint64, uintptr and complex64). Passing any other type will panic.
+func (s *Statement) LitFormat(v interface{}, format string) *Statement {
+	t := token{
+		typ:     literalToken,
+		content: v,
+		format:  format,
+	}
+	*s = append(*s, t)
+	return s
+}
+
+// LitFormatFunc renders a literal with the specified format. LitFunc generates the value to render
+// by executing the provided function. LitFunc supports only built-in types (bool, string, int,
+// complex128, float64, float32, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64,
+// uintptr and complex64). Returning any other type will panic.
+func LitFormatFunc(f func() interface{}, format string) *Statement {
+	return newStatement().LitFormatFunc(f, format)
+}
+
+// LitFormatFunc renders a literal with the specified format. LitFunc generates the value to render
+// by executing the provided function. LitFunc supports only built-in types (bool, string, int,
+// complex128, float64, float32, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64,
+// uintptr and complex64). Returning any other type will panic.
+func (g *Group) LitFormatFunc(f func() interface{}, format string) *Statement {
+	s := LitFormatFunc(f, format)
+	g.items = append(g.items, s)
+	return s
+}
+
+// LitFormatFunc renders a literal with the specified format. LitFunc generates the value to render
+// by executing the provided function. LitFunc supports only built-in types (bool, string, int,
+// complex128, float64, float32, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64,
+// uintptr and complex64). Returning any other type will panic.
+func (s *Statement) LitFormatFunc(f func() interface{}, format string) *Statement {
+	t := token{
+		typ:     literalToken,
+		content: f(),
+		format:  format,
 	}
 	*s = append(*s, t)
 	return s

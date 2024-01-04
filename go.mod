@@ -1,3 +1,3 @@
-module github.com/dave/jennifer
+module github.com/ethanmoffat/jennifer
 
 go 1.20
